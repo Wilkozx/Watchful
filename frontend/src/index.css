@@ -1,4 +1,25 @@
+:root {
+  --primary-colour: #cf6679;
+  --primary-dark: #a5455e;
+  --primary-light: #f2b6c4;
+
+  --secondary-colour: #242424;
+  --secondary-dark: #111111;
+  --secondary-light: #444444;
+
+  --background-colour: #181818;
+  --text-colour: #ffffff;
+  --text-colour-dark: #5a5a5a;
+  --link-colour: #cf6679;
+  --link-hover-colour: #f2b6c4;
+
+  color: var(--text-colour);
+}
+
 body {
+  max-width: 1920px;
+  margin: 0 auto;
+  background-color: var(--background-colour);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
