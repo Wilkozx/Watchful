@@ -42,6 +42,10 @@ def setup_routes(app):
             password = request.form['password']
         except:
             return "Invalid request", 400
+        if (validateString(username) == False):
+            return "Invalid username", 400
+        if (validateString(password) == False):
+            return "Invalid password", 400
         if (userModel.doesUserExist(username)):
             if (userModel.doesPasswordMatch(username, password)):
                 token = generateToken()
@@ -62,6 +66,10 @@ def setup_routes(app):
             password = request.form['password']
         except:
             return "Invalid request", 400
+        if (validateString(username) == False):
+            return "Invalid username", 400
+        if (validateString(password) == False):
+            return "Invalid password", 400
         if (userModel.doesUserExist(username)):
             return "User already exists", 403
         userModel.createUser(username, password)
