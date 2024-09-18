@@ -7,6 +7,8 @@
   --secondary-dark: #111111;
   --secondary-light: #444444;
 
+  --tertiary-colour: #ffb764;
+
   --background-colour: #181818;
   --text-colour: #ffffff;
   --text-colour-dark: #5a5a5a;
@@ -30,4 +32,10 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+@media screen and (max-width: 768px) {
+  main {
+      flex-direction: column;
+  }
 }

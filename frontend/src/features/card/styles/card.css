@@ -1,0 +1,106 @@
+.card {
+    width: 260px;
+    max-width: 300px;
+    max-height: 480px;
+    margin: 5px;
+    background-color: var(--secondary-colour);
+}
+
+.card:hover {
+    cursor: pointer;
+}
+
+.cardImage {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+    border-radius: 0px;
+    margin: 0px;
+}
+
+.card-top {
+    position: relative;
+}
+
+.cardButton {
+    z-index: 1;
+    position: absolute;
+    right: 25px;
+    border: none;
+    padding: 5px;
+    padding-bottom: 20px;
+    padding-left: 15px;
+    background-color: var(--primary-colour);
+}
+
+.card-textcontent {
+    display: flex;
+    flex-direction: column;
+    width: 250px;
+    overflow: hidden;
+    margin: 5px;
+    margin-bottom: 0px;
+    margin-top: 5px;
+}
+
+.card-textcontent h3 {
+    margin: 0;
+    padding: 0;
+    font-size: 0.9rem;
+    overflow: hidden;
+    text-wrap: nowrap;
+}
+
+.card-textcontent h2 {
+    margin: 0;
+    padding: 0;
+    font-size: 2rem;
+    overflow: hidden;
+    text-wrap: nowrap;
+}
+
+.card-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 5px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    height: 40px;
+}
+
+
+.card-details {
+    display: flex;
+}
+
+.card-episode {
+    display: flex;
+    gap: 15px;
+}
+
+.card-episode p {
+    z-index: 1;
+    margin: 0;
+    padding: 0;
+    padding-left: 5px;
+    width: 60px;
+}
+
+#card-year {
+    padding-left: 25px;
+}
+
+.shape {
+    position: absolute;
+    border-top: 25px solid var(--primary-colour);
+    border-right: 25px solid transparent;
+    width: 60px;
+}
+
+.shape2 {
+    position: absolute;
+    border-bottom: 25px solid var(--tertiary-colour);
+    border-left: 25px solid transparent;
+    width: 60px;
+}

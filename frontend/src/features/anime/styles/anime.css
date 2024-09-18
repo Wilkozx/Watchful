@@ -1,0 +1,164 @@
+.anime {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+#anime-card-test-image {
+    position: absolute;
+    width: 1920px;
+    height: 400px;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1.0) 50%, transparent 100%);
+    background-image: url('https://images.alphacoders.com/131/thumb-1920-1311951.jpg');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    z-index: -1;
+}
+
+.anime-card {
+    display: flex;
+    flex-direction: row;
+    margin: 0 auto;
+    margin-top: 150px;
+    margin-left: 50px;
+    margin-right: 50px;
+    height: 800px;
+    border-bottom: 2px solid var(--secondary-colour);
+}
+
+.anime-card img {
+    padding: 0;
+    margin: 0;
+    border-radius: 0;
+    width: 400px;
+    height: 600px;
+    object-fit: cover;
+}
+
+.anime-card-textcontent {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.anime-card-titles {
+    width: 80%;
+}
+
+.anime-card-titles h1 {
+    font-size: 6em;
+    font-weight: 700;
+    color: var(--text-colour);
+    margin: 0;
+    padding: 0;
+    margin-top: 50px;
+    margin-left: 25px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.anime-card-titles h2 {
+    font-size: 2em;
+    font-weight: 400;
+    color: var(--text-colour);
+    margin: 0;
+    padding: 0;
+    margin-top: 10px;
+    margin-left: 25px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.anime-card-titles p {
+    font-size: 1em;
+    font-weight: 400;
+    color: var(--text-colour);
+    margin: 0;
+    padding: 0;
+    margin-top: 25px;
+    margin-left: 25px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.anime-card-details {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    margin-left: 25px;
+    margin-top: 250px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.anime-card-details em {
+    color: var(--primary-colour);
+}
+
+.anime-card-details p {
+    font-size: 1em;
+    font-weight: bold;
+    color: var(--text-colour);
+    margin: 0;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.trailer-container {
+    width: 560px;
+    height: 315px;
+    margin-left: 25px;
+    margin-top: 25px;
+}
+
+.trailer-container img {
+    width: 100%;
+    height: 100%;
+}
+
+.trailer-container button {
+    position: relative;
+    top: -180px;
+    left: 48%;
+    background-color: transparent;
+    border: none;
+    color: rgb(255, 87, 87);
+    font-size: 2rem;
+    cursor: pointer;
+    z-index: 5;
+}
+
+
+@media screen and (max-width: 768px) {
+    .anime {
+        overflow: none;
+    }
+
+    .anime-card img {
+        width: 100%;
+    }
+
+    #anime-card-test-image {
+        width: 100%;
+        height: 300px;
+    }
+
+    .anime-card {
+        flex-direction: column;
+    }
+
+    .anime-card-titles h1 {
+        font-size: 2em;
+    }
+
+    .anime-card-titles h2 {
+        font-size: 1.5em;
+    }
+
+    .anime-card-titles p {
+        font-size: 1em;
+    }
+
+    .anime-card-textcontent {
+        margin: 0;
+        padding: 0;
+        flex-direction: column;
+    }
+}
