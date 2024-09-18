@@ -149,7 +149,6 @@ def setup_routes(app):
                 user_id = userModel.getIdFromUsername(username)
                 if (user_id == None):
                     return "Error getting user id", 500
-                if (watchListModel.addAnimeToWatchlist(user_id, post_data['mal_id'])):
                 if (watchListModel.addAnimeToWatchlist(post_data['mal_id'], user_id)):
                     return "Anime added to watchlist", 201
                 else:
@@ -221,7 +220,6 @@ def setup_routes(app):
             )['data'][0]['attributes']['coverImage']['original']
         except:
             cover_image = ""
-        return jsonify({"cover_image": cover_image}), 200
         json_response = {
             "kitsu_id": kitsu_id,
             "cover_image": cover_image
@@ -240,6 +238,113 @@ def setup_routes(app):
         url = "https://api.jikan.moe/v4/anime/" + mal_id
         response = requests.get(url)
         return response.json()
+
+
+    @main.route('/api/v2/anime/search/<query>', methods=['GET'])
+    def searchV2(query):
+        url = "https://kitsu.io/api/edge/anime?filter[text]=" + query
+        response = requests.get(url)
+        custom_json = []
+        try:
+            for i in range(len(response.json()['data'])):
+                custom_json.append({
+                    "id": response.json()['data'][i]['id'] if 'id' in response.json()['data'][i] else None,
+                    "type": response.json()['data'][i]['type'] if 'type' in response.json()['data'][i] else None,
+                    "slug": response.json()['data'][i]['attributes']['slug'] if 'slug' in response.json()['data'][i]['attributes'] else None,
+                    "englishTitle": response.json()['data'][i]['attributes']['titles']['en'] if 'en' in response.json()['data'][i]['attributes']['titles'] else None,
+                    "japaneseTitle": response.json()['data'][i]['attributes']['titles']['ja_jp'] if 'ja_jp' in response.json()['data'][i]['attributes']['titles'] else None,
+                    "posterImage": response.json()['data'][i]['attributes']['posterImage']['original'] if 'posterImage' in response.json()['data'][i]['attributes'] else None,
+                    "releaseYear": response.json()['data'][i]['attributes']['startDate'] if 'startDate' in response.json()['data'][i]['attributes'] else None,
+                    "episodeCount": response.json()['data'][i]['attributes']['episodeCount'] if 'episodeCount' in response.json()['data'][i]['attributes'] else None,
+                    "showType": response.json()['data'][i]['attributes']['showType'] if 'showType' in response.json()['data'][i]['attributes'] else None,
+                })
+        except:
+            return "error", 400
+        return custom_json, 200
+
+    @main.route('/api/v2/anime/<id>', methods=['GET'])
+    def getAnimeV2(id):
+        url = "https://kitsu.io/api/edge/anime/" + id
+        response = requests.get(url)
+        if (response.json()['data'] == None):
+            return "error", 400
+        if (response.json()['data']['attributes'] == None):
+            return "error", 400
+        custom_json = {}
+        if (response.json()['data']['attributes']['posterImage'] == None):
+            custom_json['posterImage'] = ""
+        else:
+            custom_json['posterImage'] = response.json(
+            )['data']['attributes']['posterImage']['original'] or None
+        if (response.json()['data']['attributes']['coverImage'] == None):
+            custom_json['coverImage'] = ""
+        else:
+            custom_json['coverImage'] = response.json(
+            )['data']['attributes']['coverImage']['original'] or None
+        if (response.json()['data']['attributes']['titles'] == None):
+            custom_json['titles'] = ""
+        else:
+            custom_json['englishTitle'] = response.json(
+            )['data']['attributes']['titles']['en'] or None
+        custom_json['id'] = response.json()['data']['id'] or None
+        custom_json['type'] = response.json()['data']['type'] or None
+        custom_json['subtype'] = response.json(
+        )['data']['attributes']['subtype'] or None
+        custom_json['slug'] = response.json(
+        )['data']['attributes']['slug'] or None
+        custom_json['canonicalTitle'] = response.json(
+        )['data']['attributes']['canonicalTitle'] or None
+        custom_json['synopsis'] = response.json(
+        )['data']['attributes']['synopsis'] or None
+        custom_json['averageRating'] = response.json(
+        )['data']['attributes']['averageRating'] or None
+        custom_json['ageRating'] = response.json(
+        )['data']['attributes']['ageRating'] or None
+        custom_json['ageRatingGuide'] = response.json(
+        )['data']['attributes']['ageRatingGuide'] or None
+        custom_json['episodeCount'] = response.json(
+        )['data']['attributes']['episodeCount'] or None
+        custom_json['episodeLength'] = response.json(
+        )['data']['attributes']['episodeLength'] or None
+        custom_json['youtubeVideoId'] = response.json(
+        )['data']['attributes']['youtubeVideoId'] or None
+        custom_json['status'] = response.json(
+        )['data']['attributes']['status'] or None
+        custom_json['startDate'] = response.json(
+        )['data']['attributes']['startDate'] or None
+        custom_json['endDate'] = response.json(
+        )['data']['attributes']['endDate'] or None
+        custom_json['nextRelease'] = response.json(
+        )['data']['attributes']['nextRelease'] or None
+        custom_json['nsfw'] = response.json(
+        )['data']['attributes']['nsfw'] or None
+        return custom_json, 200
+
+    @main.route('/api/v2/anime/<id>/episodes', methods=['GET'])
+    def getEpisodesV2(id):
+        url = "https://kitsu.io/api/edge/anime/" + \
+            id + "/episodes?page[limit]=20"
+        response = requests.get(url)
+        custom_json_list = []
+        for i in range(len(response.json()['data'])):
+            custom_json = {}
+            if (response.json()['data'] == None):
+                return "error", 400
+            else:
+                episode = response.json()['data'][i]
+            custom_json["id"] = episode['id'] or None
+            custom_json["type"] = episode['type'] or None
+            if (response.json()['data'][i]['attributes'] == None):
+                return "error", 400
+            else:
+                custom_json["title"] = episode['attributes']['canonicalTitle'] or None
+                custom_json["number"] = episode['attributes']['number'] or None
+            if (response.json()['data'][i]['attributes']['thumbnail'] == None):
+                custom_json["thumbnail"] = ""
+            else:
+                custom_json["thumbnail"] = episode['attributes']['thumbnail']['original'] or None
+            custom_json_list.append(custom_json)
+        return custom_json_list, 200
 
     app.register_blueprint(main)
 
