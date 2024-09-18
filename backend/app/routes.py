@@ -210,6 +210,14 @@ def setup_routes(app):
                 return "Anime is not in watchlist", 404
         return "Invalid token provided", 403
 
+    @main.route('/api/v1/anime/background/<query>', methods=['GET'])
+    def getBackground(query):
+        url = "https://kitsu.io/api/edge/anime?filter[text]=" + query
+        response = requests.get(url)
+        cover_image = response.json(
+        )['data'][0]['attributes']['coverImage']['original']
+        return jsonify({"cover_image": cover_image}), 200
+
     @main.route('/api/v1/anime/get/<mal_id>', methods=['GET'])
     def getAnime(mal_id):
         url = "https://api.jikan.moe/v4/anime/" + mal_id

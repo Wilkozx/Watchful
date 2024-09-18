@@ -6,6 +6,7 @@ const Anime = ({ selectedComponent }) => {
 
   const [playTrailer, setPlayTrailer] = React.useState(false);
 
+  const [animeCoverImage, setAnimeCoverImage] = React.useState("");
   const [englishName, setEnglishName] = React.useState("");
   const [japaneseName, setJapaneseName] = React.useState("");
   const [backgroundImage, setBackgroundImage] = React.useState("");
@@ -62,13 +63,32 @@ const Anime = ({ selectedComponent }) => {
     }
   };
 
+  const getCoverImage = async () => {
+    let response = await fetch(
+      "http://localhost:5000/api/v1/anime/background/" + japaneseName ||
+        englishName,
+      {
+        method: "GET",
+      }
+    );
+
+    if (response.status === 200) {
+      let data = await response.json();
+      setAnimeCoverImage(data["cover_image"]);
+    }
+  };
+
   useEffect(() => {
     getAnime();
   }, []);
 
+  useEffect(() => {
+    getCoverImage();
+  }, [japaneseName]);
+
   return (
     <div className="anime">
-      <div id="anime-card-test-image"></div>
+      <img id="anime-cover-image" src={animeCoverImage}></img>
       <div className="anime-card">
         <img src={backgroundImage} alt="anime cover" />
         <div className="anime-card-textcontent">
