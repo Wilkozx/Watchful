@@ -32,6 +32,7 @@ const Card = ({
           </div>
           <div className="card-episode">
             <p id="card-year">{year}</p>
+            <p id="card-year">{year.substring(0, 4)}</p>
             <div className="shape2"></div>
           </div>
         </div>
