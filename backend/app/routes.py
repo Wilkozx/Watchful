@@ -214,8 +214,11 @@ def setup_routes(app):
     def getBackground(query):
         url = "https://kitsu.io/api/edge/anime?filter[text]=" + query
         response = requests.get(url)
-        cover_image = response.json(
-        )['data'][0]['attributes']['coverImage']['original']
+        try:
+            cover_image = response.json(
+            )['data'][0]['attributes']['coverImage']['original']
+        except:
+            cover_image = ""
         return jsonify({"cover_image": cover_image}), 200
 
     @main.route('/api/v1/anime/get/<mal_id>', methods=['GET'])
