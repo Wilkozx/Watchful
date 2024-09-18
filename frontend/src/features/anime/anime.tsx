@@ -55,8 +55,13 @@ const Anime = ({ selectedComponent }) => {
       setEpisodes(data.data["episodes"]);
       setStatus(data.data["status"]);
       setDuration(data.data["duration"].replace("per ep", ""));
-      setAiredFrom(data.data["aired"]["from"].replace("T00:00:00+00:00", ""));
-      setAiredTo(data.data["aired"]["to"].replace("T00:00:00+00:00", ""));
+      try {
+        setAiredFrom(data.data["aired"]["from"].replace("T00:00:00+00:00", ""));
+        setAiredTo(data.data["aired"]["to"].replace("T00:00:00+00:00", ""));
+      } catch (e) {
+        setAiredFrom("Unknown");
+        setAiredTo("Unknown");
+      }
       setSeason(data.data["season"]);
       setStudio(data.data["studios"][0]["name"]);
       setAniListLink(data.data["url"]);
@@ -66,7 +71,7 @@ const Anime = ({ selectedComponent }) => {
   const getCoverImage = async () => {
     let response = await fetch(
       "http://localhost:5000/api/v1/anime/background/" + japaneseName ||
-        englishName,
+        englishName.substring(0, englishName.indexOf(":")),
       {
         method: "GET",
       }
@@ -75,6 +80,10 @@ const Anime = ({ selectedComponent }) => {
     if (response.status === 200) {
       let data = await response.json();
       setAnimeCoverImage(data["cover_image"]);
+    }
+
+    if (response.status === 404) {
+      setAnimeCoverImage("");
     }
   };
 
@@ -88,7 +97,11 @@ const Anime = ({ selectedComponent }) => {
 
   return (
     <div className="anime">
-      <img id="anime-cover-image" src={animeCoverImage}></img>
+      {animeCoverImage === "" ? (
+        <></>
+      ) : (
+        <img id="anime-cover-image" src={animeCoverImage}></img>
+      )}
       <div className="anime-card">
         <img src={backgroundImage} alt="anime cover" />
         <div className="anime-card-textcontent">
