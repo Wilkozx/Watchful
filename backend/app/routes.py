@@ -215,11 +215,24 @@ def setup_routes(app):
         url = "https://kitsu.io/api/edge/anime?filter[text]=" + query
         response = requests.get(url)
         try:
+            kitsu_id = response.json()['data'][0]['id']
             cover_image = response.json(
             )['data'][0]['attributes']['coverImage']['original']
         except:
             cover_image = ""
         return jsonify({"cover_image": cover_image}), 200
+        json_response = {
+            "kitsu_id": kitsu_id,
+            "cover_image": cover_image
+        }
+        return json_response, 200
+
+    @main.route('/api/v1/anime/episodes/<kitsu_id>', methods=['GET'])
+    def getEpisodes(kitsu_id):
+        url = "https://kitsu.io/api/edge/anime/" + \
+            kitsu_id + "/episodes?page[limit]=20"
+        response = requests.get(url)
+        return response.json()
 
     @main.route('/api/v1/anime/get/<mal_id>', methods=['GET'])
     def getAnime(mal_id):

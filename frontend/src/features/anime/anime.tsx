@@ -3,6 +3,8 @@ import "./styles/anime.css";
 
 const Anime = ({ selectedComponent }) => {
   let id = selectedComponent.split(":")[1];
+  const [episodes, setEpisodes] = React.useState([]);
+  const [kitsuId, setKitsuId] = React.useState("");
 
   const [playTrailer, setPlayTrailer] = React.useState(false);
 
@@ -15,7 +17,7 @@ const Anime = ({ selectedComponent }) => {
   const [trailer, setTrailer] = React.useState("");
   const [trailerImage, setTrailerImage] = React.useState("");
   const [type, setType] = React.useState("");
-  const [episodes, setEpisodes] = React.useState(0);
+  const [episodeCount, setEpisodeCount] = React.useState(0);
   const [status, setStatus] = React.useState("");
   const [duration, setDuration] = React.useState("");
   const [airedFrom, setAiredFrom] = React.useState("");
@@ -52,7 +54,7 @@ const Anime = ({ selectedComponent }) => {
       setTrailer(data.data["trailer"].embed_url);
       setTrailerImage(data.data["trailer"]["images"]["maximum_image_url"]);
       setType(data.data["type"]);
-      setEpisodes(data.data["episodes"]);
+      setEpisodeCount(data.data["episodes"]);
       setStatus(data.data["status"]);
       setDuration(data.data["duration"].replace("per ep", ""));
       try {
@@ -80,10 +82,31 @@ const Anime = ({ selectedComponent }) => {
     if (response.status === 200) {
       let data = await response.json();
       setAnimeCoverImage(data["cover_image"]);
+      setKitsuId(data["kitsu_id"]);
     }
 
     if (response.status === 404) {
       setAnimeCoverImage("");
+    }
+  };
+
+  const getAlternativeEpisodes = async () => {
+    let response = await fetch(
+      "http://localhost:5000/api/v1/anime/episodes/" + kitsuId,
+      {
+        method: "GET",
+      }
+    );
+
+    if (response.status === 200) {
+      let data = await response.json();
+      if (data["data"] === undefined) {
+        console.log(data["data"]);
+        setEpisodes([]);
+        return;
+      }
+      setEpisodes(data["data"]);
+      console.log(data["data"]);
     }
   };
 
@@ -94,6 +117,10 @@ const Anime = ({ selectedComponent }) => {
   useEffect(() => {
     getCoverImage();
   }, [japaneseName]);
+
+  useEffect(() => {
+    getAlternativeEpisodes();
+  }, [kitsuId]);
 
   return (
     <div className="anime">
@@ -114,7 +141,7 @@ const Anime = ({ selectedComponent }) => {
             <p>
               Type: <em>{type}</em>
             </p>
-            <p>Episodes: {episodes}</p>
+            <p>Episodes: {episodeCount}</p>
             <p>
               Status: <em>{status}</em>
             </p>
@@ -133,6 +160,7 @@ const Anime = ({ selectedComponent }) => {
           </div>
         </div>
       </div>
+      <h1>Trailer</h1>
       <div className="trailer-container">
         {trailer ? (
           playTrailer ? (
@@ -155,6 +183,39 @@ const Anime = ({ selectedComponent }) => {
           <p>No trailer available</p>
         )}
       </div>
+      {episodes ? (
+        <>
+          <h1>Episodes</h1>
+          <div className="episode-container">
+            {episodes.map((episode) => (
+              <div className="episode-card">
+                {episode["attributes"]["thumbnail"] === null ? (
+                  <img
+                    src={animeCoverImage}
+                    alt={"episode" + episode["attributes"]["number"]}
+                  />
+                ) : (
+                  <img
+                    src={episode["attributes"]["thumbnail"]["original"]}
+                    alt={"episode" + episode["attributes"]["number"]}
+                  />
+                )}
+                <div className="episode-card-details">
+                  <h1>{episode["attributes"]["canonicalTitle"]}</h1>
+                  <div className="episode-card-info">
+                    <p>Episode {episode["attributes"]["number"]}</p>
+                    <p>
+                      <em>{episode["attributes"]["length"]} minutes</em>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      ) : (
+        <p>No episodes available</p>
+      )}
     </div>
   );
 };
