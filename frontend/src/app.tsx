@@ -20,12 +20,12 @@ export const App = () => {
 
   const search = async (query) => {
     try {
-      const response = await searchQuery(`/search/${query}`);
+      const response = await searchQuery(`/api/v2/anime/search/${query}`);
       if (response === 404) {
         console.log("No results found");
         return;
       } else {
-        setSearchResults(response.data);
+        setSearchResults(response);
       }
     } catch (error) {
       console.log(error);
