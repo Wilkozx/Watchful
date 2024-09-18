@@ -210,6 +210,12 @@ def setup_routes(app):
                 return "Anime is not in watchlist", 404
         return "Invalid token provided", 403
 
+    @main.route('/api/v1/anime/get/<mal_id>', methods=['GET'])
+    def getAnime(mal_id):
+        url = "https://api.jikan.moe/v4/anime/" + mal_id
+        response = requests.get(url)
+        return response.json()
+
     app.register_blueprint(main)
 
 
