@@ -10,13 +10,13 @@ const DisplayResults = ({ searchResults, onComponentChange }) => {
         return (
           <Card
             onComponentChange={onComponentChange}
-            id={result.mal_id}
-            image={result["images"]["jpg"]["large_image_url"]}
-            title={result.title_english || result.title}
-            japaneseTitle={result.title_japanese}
-            episodes={result.episodes}
-            year={result.year}
-            type={result.type}
+            id={result.id}
+            image={result.posterImage}
+            title={result.englishTitle}
+            japaneseTitle={result.japaneseTitle}
+            episodes={result.episodeCount}
+            year={result.releaseYear || "N/A"}
+            type={result.showType}
           />
         );
       })}
