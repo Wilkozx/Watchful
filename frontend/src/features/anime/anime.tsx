@@ -5,14 +5,20 @@ const Anime = ({ selectedComponent }) => {
   let id = selectedComponent.split(":")[1];
   const [episodes, setEpisodes] = React.useState([]);
   const [kitsuId, setKitsuId] = React.useState("");
+  const [alternative, setAlternative] = React.useState(false);
 
   const [playTrailer, setPlayTrailer] = React.useState(false);
 
+  // done
   const [animeCoverImage, setAnimeCoverImage] = React.useState("");
-  const [englishName, setEnglishName] = React.useState("");
-  const [japaneseName, setJapaneseName] = React.useState("");
   const [backgroundImage, setBackgroundImage] = React.useState("");
   const [synopsis, setSynopsis] = React.useState("");
+  const [youtubeId, setYoutubeId] = React.useState("");
+
+  // redo
+  const [englishName, setEnglishName] = React.useState("");
+  const [japaneseName, setJapaneseName] = React.useState("");
+
   const [isAiring, setIsAiring] = React.useState(false);
   const [trailer, setTrailer] = React.useState("");
   const [trailerImage, setTrailerImage] = React.useState("");
@@ -28,52 +34,37 @@ const Anime = ({ selectedComponent }) => {
   const [aniListLink, setAniListLink] = React.useState("");
 
   const getAnime = async () => {
-    let response = await fetch(
-      "http://localhost:5000//api/v1/anime/get/" + id,
-      {
-        method: "GET",
-      }
-    );
+    let response = await fetch("http://localhost:5000/api/v2/anime/" + id, {
+      method: "GET",
+    });
     if (response.status === 404) {
       return;
     }
 
     if (response.status === 200) {
       let data = await response.json();
-      if (data.data === undefined) {
-        setEnglishName("No data found retry");
-        return;
-      }
-      setEnglishName(
-        data.data["title_synonyms"][0] || data.data["title_english"]
+      setBackgroundImage(data["posterImage"]);
+      setAnimeCoverImage(data["coverImage"]);
+      setJapaneseName(data["canonicalTitle"]);
+      setEnglishName(data["englishTitle"]);
+      setSynopsis(data["synopsis"]);
+      setTrailer(
+        "https://www.youtube.com/embed/" +
+          data["youtubeVideoId"] +
+          "?enablejsapi=1&wmode=opaque&autoplay=1"
       );
-      setJapaneseName(data.data["title"].replaceAll('"', ""));
-      setBackgroundImage(data.data["images"]["jpg"]["large_image_url"]);
-      setSynopsis(data.data["synopsis"]);
-      setIsAiring(data.data["is_airing"]);
-      setTrailer(data.data["trailer"].embed_url);
-      setTrailerImage(data.data["trailer"]["images"]["maximum_image_url"]);
-      setType(data.data["type"]);
-      setEpisodeCount(data.data["episodes"]);
-      setStatus(data.data["status"]);
-      setDuration(data.data["duration"].replace("per ep", ""));
-      try {
-        setAiredFrom(data.data["aired"]["from"].replace("T00:00:00+00:00", ""));
-        setAiredTo(data.data["aired"]["to"].replace("T00:00:00+00:00", ""));
-      } catch (e) {
-        setAiredFrom("Unknown");
-        setAiredTo("Unknown");
-      }
-      setSeason(data.data["season"]);
-      setStudio(data.data["studios"][0]["name"]);
-      setAniListLink(data.data["url"]);
+      setTrailerImage(data["coverImage"]);
+      setType(data["subtype"]);
+      setEpisodeCount(data["episodeCount"]);
+      setStatus(data["status"]);
+      setAiredFrom(data["startDate"]);
+      setAiredTo(data["endDate"]);
     }
   };
 
-  const getCoverImage = async () => {
+  const getEpisodes = async () => {
     let response = await fetch(
-      "http://localhost:5000/api/v1/anime/background/" + japaneseName ||
-        englishName.substring(0, englishName.indexOf(":")),
+      "http://localhost:5000/api/v2/anime/" + id + "/episodes",
       {
         method: "GET",
       }
@@ -81,56 +72,52 @@ const Anime = ({ selectedComponent }) => {
 
     if (response.status === 200) {
       let data = await response.json();
-      setAnimeCoverImage(data["cover_image"]);
-      setKitsuId(data["kitsu_id"]);
-    }
-
-    if (response.status === 404) {
-      setAnimeCoverImage("");
+      setEpisodes(data);
+      console.log(episodes);
     }
   };
 
-  const getAlternativeEpisodes = async () => {
-    let response = await fetch(
-      "http://localhost:5000/api/v1/anime/episodes/" + kitsuId,
-      {
-        method: "GET",
-      }
-    );
+  const addToWatchlist = async () => {
+    let response = await fetch("http://localhost:5000/api/v1/watchlist/add", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: sessionStorage.getItem("token") ?? "",
+      },
+      body: JSON.stringify({
+        mal_id: id,
+        english_name: englishName,
+        japanese_name: japaneseName,
+        image_url: animeCoverImage,
+        total_episodes: episodeCount,
+        release_date: airedFrom,
+        release_type: type,
+      }),
+    });
 
     if (response.status === 200) {
-      let data = await response.json();
-      if (data["data"] === undefined) {
-        console.log(data["data"]);
-        setEpisodes([]);
-        return;
-      }
-      setEpisodes(data["data"]);
-      console.log(data["data"]);
+      console.log("Added to watchlist");
     }
   };
 
   useEffect(() => {
     getAnime();
+    getEpisodes();
   }, []);
-
-  useEffect(() => {
-    getCoverImage();
-  }, [japaneseName]);
-
-  useEffect(() => {
-    getAlternativeEpisodes();
-  }, [kitsuId]);
 
   return (
     <div className="anime">
+      <h1>{kitsuId}</h1>
       {animeCoverImage === "" ? (
         <></>
       ) : (
         <img id="anime-cover-image" src={animeCoverImage}></img>
       )}
       <div className="anime-card">
-        <img src={backgroundImage} alt="anime cover" />
+        <div className="anime-card-cover">
+          <img src={backgroundImage} alt="anime cover" />
+          <button onClick={addToWatchlist}>Add to Watchlist</button>
+        </div>
         <div className="anime-card-textcontent">
           <div className="anime-card-titles">
             <h1>{japaneseName}</h1>
@@ -151,12 +138,6 @@ const Anime = ({ selectedComponent }) => {
             </p>
             <p>Studio: {studio}</p>
             <p>Genres: {genres}</p>
-            <p>
-              Anilist:{" "}
-              <a href={aniListLink}>
-                <em>Link</em>
-              </a>
-            </p>
           </div>
         </div>
       </div>
@@ -168,9 +149,10 @@ const Anime = ({ selectedComponent }) => {
               width={560}
               height={315}
               src={trailer}
-              title="YouTube video player"
+              title="Youtube Video Player"
               frameBorder={0}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
               allowFullScreen
             ></iframe>
           ) : (
@@ -189,24 +171,26 @@ const Anime = ({ selectedComponent }) => {
           <div className="episode-container">
             {episodes.map((episode) => (
               <div className="episode-card">
-                {episode["attributes"]["thumbnail"] === null ? (
+                {episode["thumbnail"] === null ? (
                   <img
+                    id={episode["id"]}
                     src={animeCoverImage}
-                    alt={"episode" + episode["attributes"]["number"]}
+                    alt={"episode " + episode["number"]}
                   />
                 ) : (
                   <img
-                    src={episode["attributes"]["thumbnail"]["original"]}
-                    alt={"episode" + episode["attributes"]["number"]}
+                    id={episode["id"]}
+                    src={episode["thumbnail"]}
+                    alt={"episode " + episode["number"]}
                   />
                 )}
                 <div className="episode-card-details">
-                  <h1>{episode["attributes"]["canonicalTitle"]}</h1>
+                  <h1>{episode["title"]}</h1>
                   <div className="episode-card-info">
-                    <p>Episode {episode["attributes"]["number"]}</p>
-                    <p>
+                    <p>Episode {episode["number"]}</p>
+                    {/* <p>
                       <em>{episode["attributes"]["length"]} minutes</em>
-                    </p>
+                    </p> */}
                   </div>
                 </div>
               </div>
