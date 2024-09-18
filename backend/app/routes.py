@@ -150,6 +150,7 @@ def setup_routes(app):
                 if (user_id == None):
                     return "Error getting user id", 500
                 if (watchListModel.addAnimeToWatchlist(user_id, post_data['mal_id'])):
+                if (watchListModel.addAnimeToWatchlist(post_data['mal_id'], user_id)):
                     return "Anime added to watchlist", 201
                 else:
                     return "Error adding anime to watchlist", 500
