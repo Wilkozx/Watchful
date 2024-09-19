@@ -35,6 +35,7 @@ const Anime = ({ selectedComponent }) => {
 
   const getAnime = async () => {
     let response = await fetch("http://localhost:5000/api/v2/anime/" + id, {
+    let response = await fetch("http://localhost:5000/api/v1/anime/" + id, {
       method: "GET",
     });
     if (response.status === 404) {
@@ -65,6 +66,7 @@ const Anime = ({ selectedComponent }) => {
   const getEpisodes = async () => {
     let response = await fetch(
       "http://localhost:5000/api/v2/anime/" + id + "/episodes",
+      "http://localhost:5000/api/v1/anime/" + id + "/episodes",
       {
         method: "GET",
       }
