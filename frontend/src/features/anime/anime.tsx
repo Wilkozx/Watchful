@@ -34,7 +34,6 @@ const Anime = ({ selectedComponent }) => {
   const [aniListLink, setAniListLink] = React.useState("");
 
   const getAnime = async () => {
-    let response = await fetch("http://localhost:5000/api/v2/anime/" + id, {
     let response = await fetch("http://localhost:5000/api/v1/anime/" + id, {
       method: "GET",
     });
@@ -44,11 +43,11 @@ const Anime = ({ selectedComponent }) => {
 
     if (response.status === 200) {
       let data = await response.json();
-      setBackgroundImage(data["posterImage"]);
-      setAnimeCoverImage(data["coverImage"]);
-      setJapaneseName(data["canonicalTitle"]);
-      setEnglishName(data["englishTitle"]);
-      setSynopsis(data["synopsis"]);
+      setBackgroundImage(data["posterImage"] ?? "");
+      setAnimeCoverImage(data["coverImage"] ?? "");
+      setJapaneseName(data["canonicalTitle"] ?? "");
+      setEnglishName(data["englishTitle"] ?? "");
+      setSynopsis(data["synopsis"] ?? "");
       setTrailer(
         "https://www.youtube.com/embed/" +
           data["youtubeVideoId"] +
@@ -65,7 +64,6 @@ const Anime = ({ selectedComponent }) => {
 
   const getEpisodes = async () => {
     let response = await fetch(
-      "http://localhost:5000/api/v2/anime/" + id + "/episodes",
       "http://localhost:5000/api/v1/anime/" + id + "/episodes",
       {
         method: "GET",
@@ -75,7 +73,6 @@ const Anime = ({ selectedComponent }) => {
     if (response.status === 200) {
       let data = await response.json();
       setEpisodes(data);
-      console.log(episodes);
     }
   };
 
@@ -87,10 +84,10 @@ const Anime = ({ selectedComponent }) => {
         Authorization: sessionStorage.getItem("token") ?? "",
       },
       body: JSON.stringify({
-        mal_id: id,
+        id: id,
         english_name: englishName,
         japanese_name: japaneseName,
-        image_url: animeCoverImage,
+        image_url: backgroundImage,
         total_episodes: episodeCount,
         release_date: airedFrom,
         release_type: type,
@@ -172,29 +169,33 @@ const Anime = ({ selectedComponent }) => {
           <h1>Episodes</h1>
           <div className="episode-container">
             {episodes.map((episode) => (
-              <div className="episode-card">
-                {episode["thumbnail"] === null ? (
+              <div key={episode["id"]} className="episode-card">
+                {episode["thumbnail"] === "" ? (
                   <img
-                    id={episode["id"]}
                     src={animeCoverImage}
                     alt={"episode " + episode["number"]}
                   />
                 ) : (
                   <img
-                    id={episode["id"]}
                     src={episode["thumbnail"]}
                     alt={"episode " + episode["number"]}
                   />
                 )}
-                <div className="episode-card-details">
-                  <h1>{episode["title"]}</h1>
-                  <div className="episode-card-info">
-                    <p>Episode {episode["number"]}</p>
-                    {/* <p>
-                      <em>{episode["attributes"]["length"]} minutes</em>
-                    </p> */}
+                {episode["tite"] === "" ? (
+                  <div className="episode-card-details">
+                    <h1>{"episode" + episode["number"]}</h1>
+                    <div className="episode-card-info">
+                      <p>Episode {episode["number"]}</p>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="episode-card-details">
+                    <h1>{episode["title"]}</h1>
+                    <div className="episode-card-info">
+                      <p>Episode {episode["number"]}</p>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
