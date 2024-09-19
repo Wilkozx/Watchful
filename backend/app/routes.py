@@ -13,18 +13,7 @@ watchListModel = watchListModel.WatchlistModel()
 def setup_routes(app):
     main = Blueprint('main', __name__)
 
-    # Routes for the anime API
-    @main.route('/search/<query>', methods=['GET', 'POST'])
-    def search(query):
-        url = "https://api.jikan.moe/v4/anime?q=" + query + "&sfw=true"
-        response = requests.get(url)
-        return response.json()
-
-    @main.route('/season/now', methods=['GET'])
-    def searchSeason():
-        url = "https://api.jikan.moe/v4/seasons/now?sfw=true"
-        response = requests.get(url)
-        return response.json()
+    # User API routes
 
     @main.route('/api/v1/user/username', methods=['GET'])
     def getUsername():
@@ -88,7 +77,6 @@ def setup_routes(app):
             return "Logged out", 200
         return "Invalid token provided", 403
 
-    # TODO: change just username return to full profile data lol
     @main.route('/api/v1/user/profile', methods=['GET'])
     def getProfile():
         token = request.headers.get('Authorization')
@@ -127,6 +115,8 @@ def setup_routes(app):
             return "Profile updated", 200
         return "Error updating profile", 500
 
+    # Watchlist API routes
+
     @main.route('/api/v1/watchlist/add', methods=['POST'])
     def addToWatchList():
         token = request.headers.get('Authorization')
@@ -136,7 +126,7 @@ def setup_routes(app):
                 return "Error getting username", 500
 
             post_data = {
-                "mal_id": request.get_json()['mal_id'] if 'mal_id' in request.get_json() else None,
+                "id": request.get_json()['id'] if 'id' in request.get_json() else None,
                 "english_name": request.get_json()['english_name'] if 'english_name' in request.get_json() else None,
                 "japanese_name": request.get_json()['japanese_name'] if 'japanese_name' in request.get_json() else None,
                 "image_url": request.get_json()['image_url'] if 'image_url' in request.get_json() else None,
@@ -145,11 +135,11 @@ def setup_routes(app):
                 "release_type": request.get_json()['release_type'] if 'release_type' in request.get_json() else None,
             }
 
-            if (animeListModel.addAnime(post_data['mal_id'], post_data['english_name'], post_data['japanese_name'], post_data['image_url'], post_data['total_episodes'], post_data['release_date'], post_data['release_type'])):
+            if (animeListModel.addAnime(post_data['id'], post_data['english_name'], post_data['japanese_name'], post_data['image_url'], post_data['total_episodes'], post_data['release_date'], post_data['release_type'])):
                 user_id = userModel.getIdFromUsername(username)
                 if (user_id == None):
                     return "Error getting user id", 500
-                if (watchListModel.addAnimeToWatchlist(post_data['mal_id'], user_id)):
+                if (watchListModel.addAnimeToWatchlist(int(post_data['id']), user_id, 2, post_data['english_name'], post_data['japanese_name'], post_data['image_url'], post_data['total_episodes'], post_data['release_date'], post_data['release_type'])):
                     return "Anime added to watchlist", 201
                 else:
                     return "Error adding anime to watchlist", 500
@@ -187,7 +177,7 @@ def setup_routes(app):
             watchlist = watchListModel.getWatchlist(user_id)
             if (watchlist == None):
                 return "Error getting watchlist", 500
-            return jsonify(watchlist), 200
+            return watchlist, 200
         return "Invalid token provided", 403
 
     @main.route('/api/v1/watchlist/check', methods=['POST'])
@@ -210,37 +200,9 @@ def setup_routes(app):
                 return "Anime is not in watchlist", 404
         return "Invalid token provided", 403
 
-    @main.route('/api/v1/anime/background/<query>', methods=['GET'])
-    def getBackground(query):
-        url = "https://kitsu.io/api/edge/anime?filter[text]=" + query
-        response = requests.get(url)
-        try:
-            kitsu_id = response.json()['data'][0]['id']
-            cover_image = response.json(
-            )['data'][0]['attributes']['coverImage']['original']
-        except:
-            cover_image = ""
-        json_response = {
-            "kitsu_id": kitsu_id,
-            "cover_image": cover_image
-        }
-        return json_response, 200
+    # Anime API routes
 
-    @main.route('/api/v1/anime/episodes/<kitsu_id>', methods=['GET'])
-    def getEpisodes(kitsu_id):
-        url = "https://kitsu.io/api/edge/anime/" + \
-            kitsu_id + "/episodes?page[limit]=20"
-        response = requests.get(url)
-        return response.json()
-
-    @main.route('/api/v1/anime/get/<mal_id>', methods=['GET'])
-    def getAnime(mal_id):
-        url = "https://api.jikan.moe/v4/anime/" + mal_id
-        response = requests.get(url)
-        return response.json()
-
-
-    @main.route('/api/v2/anime/search/<query>', methods=['GET'])
+    @main.route('/api/v1/anime/search/<query>', methods=['GET'])
     def searchV2(query):
         url = "https://kitsu.io/api/edge/anime?filter[text]=" + query
         response = requests.get(url)
@@ -251,18 +213,18 @@ def setup_routes(app):
                     "id": response.json()['data'][i]['id'] if 'id' in response.json()['data'][i] else None,
                     "type": response.json()['data'][i]['type'] if 'type' in response.json()['data'][i] else None,
                     "slug": response.json()['data'][i]['attributes']['slug'] if 'slug' in response.json()['data'][i]['attributes'] else None,
-                    "englishTitle": response.json()['data'][i]['attributes']['titles']['en'] if 'en' in response.json()['data'][i]['attributes']['titles'] else None,
+                    "englishTitle": response.json()['data'][i]['attributes']['titles']['en_jp'] if 'en_jp' in response.json()['data'][i]['attributes']['titles'] else None,
                     "japaneseTitle": response.json()['data'][i]['attributes']['titles']['ja_jp'] if 'ja_jp' in response.json()['data'][i]['attributes']['titles'] else None,
                     "posterImage": response.json()['data'][i]['attributes']['posterImage']['original'] if 'posterImage' in response.json()['data'][i]['attributes'] else None,
                     "releaseYear": response.json()['data'][i]['attributes']['startDate'] if 'startDate' in response.json()['data'][i]['attributes'] else None,
                     "episodeCount": response.json()['data'][i]['attributes']['episodeCount'] if 'episodeCount' in response.json()['data'][i]['attributes'] else None,
-                    "showType": response.json()['data'][i]['attributes']['showType'] if 'showType' in response.json()['data'][i]['attributes'] else None,
+                    "showType": response.json()['data'][i]['attributes']['showType'] if 'showType' in response.json()['data'][i]['attributes'] else None
                 })
         except:
             return "error", 400
         return custom_json, 200
 
-    @main.route('/api/v2/anime/<id>', methods=['GET'])
+    @main.route('/api/v1/anime/<id>', methods=['GET'])
     def getAnimeV2(id):
         url = "https://kitsu.io/api/edge/anime/" + id
         response = requests.get(url)
@@ -283,6 +245,9 @@ def setup_routes(app):
             )['data']['attributes']['coverImage']['original'] or None
         if (response.json()['data']['attributes']['titles'] == None):
             custom_json['titles'] = ""
+        if (response.json()['data']['attributes']['titles'].get('en') == None):
+            custom_json['englishTitle'] = response.json(
+            )['data']['attributes']['titles']['en_jp'] or None
         else:
             custom_json['englishTitle'] = response.json(
             )['data']['attributes']['titles']['en'] or None
@@ -320,7 +285,7 @@ def setup_routes(app):
         )['data']['attributes']['nsfw'] or None
         return custom_json, 200
 
-    @main.route('/api/v2/anime/<id>/episodes', methods=['GET'])
+    @main.route('/api/v1/anime/<id>/episodes', methods=['GET'])
     def getEpisodesV2(id):
         url = "https://kitsu.io/api/edge/anime/" + \
             id + "/episodes?page[limit]=20"
@@ -368,3 +333,24 @@ def validateString(string):
     if (re.match("^[A-Za-z][A-Za-z0-9_]{0,49}$", string)):
         return True
     return False
+
+# configure to get sequel and prequel plus more seasons
+
+
+# def getSequelPrequel(response, i):
+#     sequel_prequel_url = response.json(
+#     )['data'][i]['relationships']["mediaRelationships"]['links']['related']
+#     sequel_prequel_response = requests.get(sequel_prequel_url)
+#     json_sequel_prequel_response = jsonify(sequel_prequel_response.json())
+#     sequelPrequel = ""
+#     try:
+#         for i in range(len(sequel_prequel_response.json()['data'])):
+#             if (sequel_prequel_response.json()["data"][i]["attributes"]["role"] == "sequel" or sequel_prequel_response.json()["data"][i]["attributes"]["role"] == "prequel"):
+#                 sequelPrequel = sequel_prequel_response.json(
+#                 )["data"][i]["relationships"]["destination"]["links"]["self"]
+#                 response22 = requests.get(sequelPrequel)
+#                 json_response22 = jsonify(response22.json())
+#                 sequelPrequel = response22.json()['data']['id']
+#     except:
+#         sequelPrequel = ""
+#     return sequelPrequel
