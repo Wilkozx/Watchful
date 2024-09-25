@@ -110,6 +110,8 @@ const Profile = () => {
         {selectedComponent === "profile" && (
           <div className="profile-form">
             <form onSubmit={updateProfile}>
+              {/* <label>Email:</label>
+                    <input type="text" placeholder="Email"></input> */}
               <label>Username:</label>
               <input type="text" defaultValue={username}></input>
               <label>Display Name</label>
