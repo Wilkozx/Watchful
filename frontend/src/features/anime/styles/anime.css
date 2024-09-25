@@ -31,22 +31,17 @@
     align-items: center;
 }
 
-.anime-card-cover button {
+#anime-card-dropdown {
     display: flex;
-    justify-content: center;
-    width: 250px;
-    background-color: var(--secondary-colour);
-    color: var(--text-colour);
-    font-size: 1.5em;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 15px;
+    flex-direction: row;
 }
 
-.anime-card-cover button:hover {
-    background-color: var(--primary-colour);
+#anime-card-dropdown img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-left: 10px;
 }
 
 .anime-card img {
@@ -157,7 +152,6 @@
     display: grid;
     width: 100%;
     grid-template-columns: repeat(3, 1fr);
-    
     grid-gap: 20px;
 }
 
@@ -173,8 +167,9 @@
 
 .episode-card-details {
     position: relative;
-    top: -120px;
+    top: -40%;
     background-color: rgba(0, 0, 0, 0.5);
+    height: 100px;
 }
 
 .episode-card-details h1 {
@@ -188,6 +183,45 @@
     flex-direction: row;
     margin-top: 0;
     gap: 40px;
+}
+
+.watchlist-button {
+    display: flex;
+    justify-content: center;
+    width: 280px;
+}
+
+.watchlist-button button {
+    display: flex;
+    justify-content: center;
+    background-color: var(--secondary-colour);
+    color: var(--text-colour);
+    font-size: 1.5em;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.watchlist-button button:hover {
+    background-color: var(--primary-colour);
+}
+
+#watchlist-button-dropdown {
+    display: none;
+    position: absolute;
+    background-color: var(--secondary-colour);
+    padding: 0;
+    margin-top: 63px;
+    width: 276px;
+    height: fit-content;
+    z-index: 5;
+    transition: 0.2s ease-in-out;
+}
+
+#watchlist-button-dropdown button {
+    width: 100%;
+    margin: 0px;
 }
 
 
