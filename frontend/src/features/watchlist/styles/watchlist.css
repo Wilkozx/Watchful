@@ -1,0 +1,41 @@
+.watchlist-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    margin-top: 20px;
+}
+
+
+.watchlist-card {
+    display: flex;
+    padding: 15px;
+    margin: 1px;
+    background-color: var(--secondary-colour);
+    transition: background-color 0.3s;
+}
+
+.watchlist-card:hover {
+    cursor: pointer;
+    background-color: var(--secondary-light);
+    transition: background-color 0.3s;
+}
+
+.watchlist-card h1 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin: 0;
+    padding: 10px;
+}
+
+.watchlist-card p {
+    font-size: 1rem;
+    font-weight: 400;
+    margin: 0;
+    padding: 10px;
+    color: var(--primary-colour);
+}
+
+.watchlist-card img {
+    width: 100px;
+    height: 140px;
+    object-fit: cover;
+}

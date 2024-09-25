@@ -1,7 +1,7 @@
 import React from "react";
 import "./styles/watchlist.css";
 
-const Watchlist = () => {
+const Watchlist = ({ onComponentChange }) => {
   const [watchList, setWatchList] = React.useState([]);
 
   const getWatchList = async () => {
@@ -18,17 +18,24 @@ const Watchlist = () => {
     }
   };
 
+  const handleCardClick = (id) => {
+    onComponentChange("anime:" + id);
+  };
+
   React.useEffect(() => {
     getWatchList();
   }, []);
 
   return (
     <div className="watchlist-container">
-      <h1>Watchlist</h1>
       {watchList.map((item) => (
-        <div>
-          <img src={item[3]}></img>
-          <h1>{item[1]}</h1>
+        <div
+          className="watchlist-card"
+          onClick={() => handleCardClick(item["id"])}
+        >
+          <img src={item["image_url"]}></img>
+          <h1>{item["english_name"]}</h1>
+          <p>{item["id"]}</p>
         </div>
       ))}
     </div>
