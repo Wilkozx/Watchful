@@ -32,6 +32,12 @@ CREATE TABLE watchlist (
     user_id INT NOT NULL,
     mal_id INT NOT NULL,
     tag_id INT,
+    english_name VARCHAR(500),
+    japanese_name VARCHAR(500),
+    image_url VARCHAR(500),
+    total_episodes INT,
+    release_date VARCHAR(500),
+    release_type VARCHAR(500),
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (mal_id) REFERENCES animelist(mal_id)
 );
