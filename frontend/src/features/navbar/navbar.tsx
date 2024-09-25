@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import "./styles/navbar.css";
 import { useState } from "react";
-import Dropdown from "../navbar/components/dropdown.tsx/dropdown.tsx";
+import Dropdown from "../../components/dropdown/dropdown.tsx";
 
 export const Navbar = ({ search, onComponentChange }) => {
   const [query, setQuery] = useState("");
@@ -88,7 +88,7 @@ export const Navbar = ({ search, onComponentChange }) => {
                 />
               </svg>
             }
-            onComponentChange={onComponentChange}
+            onclickEvent={onComponentChange}
             props={{
               options: ["Home", "Genre", "Types", "Newest", "Ongoing", "Top"],
               name: "navigation",
@@ -142,8 +142,8 @@ export const Navbar = ({ search, onComponentChange }) => {
 
         {isLogged && (
           <Dropdown
-            svg={<img src="./icons/profile.png" alt="profile" />}
-            onComponentChange={onComponentChange}
+            svg={<img src="./icons/profile2.png" alt="profile" />}
+            onclickEvent={onComponentChange}
             props={{
               options: ["Profile", "Watchlist"],
               name: "profile",
@@ -154,7 +154,7 @@ export const Navbar = ({ search, onComponentChange }) => {
         {!isLogged && (
           <Dropdown
             svg={<img src="./icons/placeholder.png" alt="profile" />}
-            onComponentChange={onComponentChange}
+            onclickEvent={onComponentChange}
             props={{
               options: ["Login", "Register"],
               name: "profile",
