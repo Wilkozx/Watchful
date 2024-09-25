@@ -142,7 +142,7 @@ export const Navbar = ({ search, onComponentChange }) => {
 
         {isLogged && (
           <Dropdown
-            svg={<img src="./icons/profile2.png" alt="profile" />}
+            svg={<img src="./icons/placeholder.png" alt="profile" />}
             onclickEvent={onComponentChange}
             props={{
               options: ["Profile", "Watchlist"],
