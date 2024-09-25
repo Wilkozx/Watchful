@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Navbar from "./features/navbar/navbar.tsx";
 import Form from "./components/form/form.tsx";
+
 import Profile from "./features/profile/profile.tsx";
 
 import DisplayResults from "./features/displayResults/displayResults.tsx";
@@ -121,7 +122,9 @@ export const App = () => {
 
       {selectedComponent === "profile" && <Profile />}
 
-      {selectedComponent === "watchlist" && <Watchlist />}
+      {selectedComponent === "watchlist" && (
+        <Watchlist onComponentChange={handleComponentChange} />
+      )}
     </>
   );
 };
