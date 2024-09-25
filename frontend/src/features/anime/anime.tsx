@@ -2,69 +2,61 @@ import React, { useEffect } from "react";
 import "./styles/anime.css";
 
 const Anime = ({ selectedComponent }) => {
-  let id = selectedComponent.split(":")[1];
-  const [episodes, setEpisodes] = React.useState([]);
-  const [kitsuId, setKitsuId] = React.useState("");
-  const [alternative, setAlternative] = React.useState(false);
-
   const [playTrailer, setPlayTrailer] = React.useState(false);
-
-  // done
-  const [animeCoverImage, setAnimeCoverImage] = React.useState("");
-  const [backgroundImage, setBackgroundImage] = React.useState("");
-  const [synopsis, setSynopsis] = React.useState("");
-  const [youtubeId, setYoutubeId] = React.useState("");
-
-  // redo
-  const [englishName, setEnglishName] = React.useState("");
-  const [japaneseName, setJapaneseName] = React.useState("");
-
-  const [isAiring, setIsAiring] = React.useState(false);
-  const [trailer, setTrailer] = React.useState("");
-  const [trailerImage, setTrailerImage] = React.useState("");
-  const [type, setType] = React.useState("");
-  const [episodeCount, setEpisodeCount] = React.useState(0);
-  const [status, setStatus] = React.useState("");
-  const [duration, setDuration] = React.useState("");
-  const [airedFrom, setAiredFrom] = React.useState("");
-  const [airedTo, setAiredTo] = React.useState("");
-  const [season, setSeason] = React.useState("");
-  const [studio, setStudio] = React.useState("");
-  const [genres, setGenres] = React.useState("");
-  const [aniListLink, setAniListLink] = React.useState("");
+  const [episodes, setEpisodes] = React.useState([]);
+  const [animeData, setAnimeData] = React.useState({
+    id: selectedComponent.split(":")[1],
+    backgroundImage: "",
+    coverImage: "",
+    japanese_title: "",
+    english_title: "",
+    synopsis: "",
+    trailer: "",
+    trailerImage: "",
+    type: "",
+    episodeCount: 0,
+    status: "",
+    airedFrom: "",
+    airedTo: "",
+  });
 
   const getAnime = async () => {
-    let response = await fetch("http://localhost:5000/api/v1/anime/" + id, {
-      method: "GET",
-    });
-    if (response.status === 404) {
-      return;
-    }
+    let response = await fetch(
+      "http://localhost:5000/api/v1/anime/" + animeData["id"],
+      {
+        method: "GET",
+      }
+    );
 
     if (response.status === 200) {
       let data = await response.json();
-      setBackgroundImage(data["posterImage"] ?? "");
-      setAnimeCoverImage(data["coverImage"] ?? "");
-      setJapaneseName(data["canonicalTitle"] ?? "");
-      setEnglishName(data["englishTitle"] ?? "");
-      setSynopsis(data["synopsis"] ?? "");
-      setTrailer(
-        "https://www.youtube.com/embed/" +
+
+      setAnimeData((prevData) => ({
+        ...prevData,
+        backgroundImage: data["posterImage"] ?? "",
+        coverImage: data["coverImage"] ?? "",
+        japanese_title: data["canonicalTitle"] ?? "",
+        english_title: data["englishTitle"] ?? "",
+        synopsis: data["synopsis"] ?? "",
+        trailer:
+          "https://www.youtube.com/embed/" +
           data["youtubeVideoId"] +
-          "?enablejsapi=1&wmode=opaque&autoplay=1"
-      );
-      setTrailerImage(data["coverImage"]);
-      setType(data["subtype"]);
-      setEpisodeCount(data["episodeCount"]);
-      setStatus(data["status"]);
-      setAiredFrom(data["startDate"]);
-      setAiredTo(data["endDate"]);
+          "?enablejsapi=1&wmode=opaque&autoplay=1",
+        trailerImage: data["coverImage"],
+        type: data["subtype"],
+        episodeCount: data["episodeCount"],
+        status: data["status"],
+        airedFrom: data["startDate"],
+        airedTo: data["endDate"],
+      }));
+
+      getEpisodes();
     }
   };
 
   const getEpisodes = async () => {
     let response = await fetch(
-      "http://localhost:5000/api/v1/anime/" + id + "/episodes",
+      "http://localhost:5000/api/v1/anime/" + animeData["id"] + "/episodes",
       {
         method: "GET",
       }
@@ -76,7 +68,7 @@ const Anime = ({ selectedComponent }) => {
     }
   };
 
-  const addToWatchlist = async () => {
+  const addToWatchlist = async (tag) => {
     let response = await fetch("http://localhost:5000/api/v1/watchlist/add", {
       method: "POST",
       headers: {
@@ -84,70 +76,97 @@ const Anime = ({ selectedComponent }) => {
         Authorization: sessionStorage.getItem("token") ?? "",
       },
       body: JSON.stringify({
-        id: id,
-        english_name: englishName,
-        japanese_name: japaneseName,
-        image_url: backgroundImage,
-        total_episodes: episodeCount,
-        release_date: airedFrom,
-        release_type: type,
+        id: animeData["id"],
+        english_name: animeData["english_title"],
+        japanese_name: animeData["japanese_title"],
+        image_url: animeData["backgroundImage"],
+        total_episodes: animeData["episodeCount"],
+        release_date: animeData["airedFrom"],
+        release_type: animeData["type"],
+        tag: tag,
       }),
     });
+  };
 
-    if (response.status === 200) {
-      console.log("Added to watchlist");
+  const handleClickEvent = (tag) => {
+    addToWatchlist(tag);
+  };
+
+  const handleDropdownClick = (e) => {
+    let dropdown = document.getElementById("watchlist-button-dropdown");
+    if (dropdown?.style.display === "block") {
+      dropdown.style.display = "none";
+    } else {
+      if (dropdown) {
+        dropdown.style.display = "block";
+      }
     }
   };
 
   useEffect(() => {
     getAnime();
-    getEpisodes();
   }, []);
 
   return (
     <div className="anime">
-      <h1>{kitsuId}</h1>
-      {animeCoverImage === "" ? (
+      {animeData["coverImage"] === "" ? (
         <></>
       ) : (
-        <img id="anime-cover-image" src={animeCoverImage}></img>
+        <img id="anime-cover-image" src={animeData["coverImage"]}></img>
       )}
       <div className="anime-card">
         <div className="anime-card-cover">
-          <img src={backgroundImage} alt="anime cover" />
-          <button onClick={addToWatchlist}>Add to Watchlist</button>
+          <img src={animeData["backgroundImage"]} alt="anime cover" />
+          <div className="watchlist-button">
+            <button onClick={() => handleClickEvent("to watch")}>
+              Add to Watchlist
+            </button>
+            <button onClick={handleDropdownClick}>▼</button>
+            <div id="watchlist-button-dropdown">
+              <button onClick={() => handleClickEvent("watching")}>
+                Watching
+              </button>
+              <button onClick={() => handleClickEvent("completed")}>
+                Completed
+              </button>
+              <button onClick={() => handleClickEvent("dropped")}>
+                Dropped
+              </button>
+            </div>
+          </div>
         </div>
         <div className="anime-card-textcontent">
           <div className="anime-card-titles">
-            <h1>{japaneseName}</h1>
-            <h2>{englishName}</h2>
-            <p>{synopsis}</p>
+            <h1>{animeData["japanese_title"]}</h1>
+            <h2>{animeData["english_title"]}</h2>
+            <p>{animeData["synopsis"]}</p>
           </div>
           <div className="anime-card-details">
             <p>
-              Type: <em>{type}</em>
+              Type: <em>{animeData["type"]}</em>
             </p>
-            <p>Episodes: {episodeCount}</p>
+            <p>Episodes: {animeData["episodeCount"]}</p>
             <p>
-              Status: <em>{status}</em>
+              Status: <em>{animeData["status"]}</em>
             </p>
-            <p>Avg Ep: {duration}</p>
+            <p>Avg Ep: {animeData["duration"]}</p>
             <p>
-              Aired: <em>{airedFrom}</em> to <em>{airedTo}</em>
+              Aired: <em>{animeData["airedFrom"]}</em> to{" "}
+              <em>{animeData["airedTo"]}</em>
             </p>
-            <p>Studio: {studio}</p>
-            <p>Genres: {genres}</p>
+            <p>Studio: {animeData["studio"]}</p>
+            <p>Genres: {animeData["genres"]}</p>
           </div>
         </div>
       </div>
       <h1>Trailer</h1>
       <div className="trailer-container">
-        {trailer ? (
+        {animeData["trailer"] ? (
           playTrailer ? (
             <iframe
               width={560}
               height={315}
-              src={trailer}
+              src={animeData["trailer"]}
               title="Youtube Video Player"
               frameBorder={0}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -156,7 +175,7 @@ const Anime = ({ selectedComponent }) => {
             ></iframe>
           ) : (
             <div>
-              <img src={trailerImage} alt="trailer" />
+              <img src={animeData["trailerImage"]} alt="trailer" />
               <button onClick={() => setPlayTrailer(true)}>▶</button>
             </div>
           )
@@ -172,7 +191,7 @@ const Anime = ({ selectedComponent }) => {
               <div key={episode["id"]} className="episode-card">
                 {episode["thumbnail"] === "" ? (
                   <img
-                    src={animeCoverImage}
+                    src={animeData["coverImage"]}
                     alt={"episode " + episode["number"]}
                   />
                 ) : (
