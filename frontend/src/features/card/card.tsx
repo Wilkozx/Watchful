@@ -16,7 +16,7 @@ const Card = ({
   };
 
   return (
-    <div className="card" id={id} onClick={handleCardClick}>
+    <div className="card" key={id} onClick={handleCardClick}>
       <div className="card-top">
         <img className="cardImage" src={image} alt={title} />
       </div>
@@ -31,7 +31,6 @@ const Card = ({
             <div className="shape"></div>
           </div>
           <div className="card-episode">
-            <p id="card-year">{year}</p>
             <p id="card-year">{year.substring(0, 4)}</p>
             <div className="shape2"></div>
           </div>
